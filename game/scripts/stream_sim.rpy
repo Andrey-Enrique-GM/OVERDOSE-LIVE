@@ -1,0 +1,1 @@
+# Lógica del bucle de simulación del stream

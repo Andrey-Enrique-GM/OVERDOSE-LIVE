@@ -1,0 +1,1 @@
+# Control de días (Día 1 a Día 3) y resúmenes
