@@ -1,32 +1,71 @@
-﻿# Coloca el código de tu juego en este archivo.
+﻿# ==============================================================================
+# INICIALIZACIÓN DE VARIABLES GLOBALES (PERSISTENTES Y DE SESIÓN)
+# ==============================================================================
 
-# Declara los personajes usados en el juego como en el ejemplo:
+# Control de desbloqueo de personajes (Persistente entre partidas)
+default persistent.unlocked_airi = True
+default persistent.unlocked_ruka = False
+default persistent.unlocked_kaori = False
 
-define e = Character("Eileen")
+# Variables de la sesión actual
+default current_character_id = ""
+default current_character_name = ""
+default current_system_prompt = ""
+
+# Puntuaciones y métricas
+default pts_afecto = 0
+default pts_stream = 0
+default current_day = 1
+
+# Importación del módulo de prompts al arrancar Ren'Py
+python early:
+    import sys
+    import os
+    game_dir = os.path.join(config.gamedir)
+    if game_dir not in sys.path:
+        sys.path.append(game_dir)
+    
+    from src.python.character_prompts import CHARACTERS
 
 
-# El juego comienza aquí.
+
+# ==============================================================================
+# PUNTO DE ENTRADA AL INICIAR NUEVA PARTIDA
+# ==============================================================================
 
 label start:
+    # Reiniciar contadores del día
+    $ pts_afecto = 0
+    $ pts_stream = 0
+    $ current_day = 1
 
-    # Muestra una imagen de fondo: Aquí se usa un marcador de posición por
-    # defecto. Es posible añadir un archivo en el directorio 'images' con el
-    # nombre "bg room.png" or "bg room.jpg" para que se muestre aquí.
+    # Transición hacia la pantalla de selección de personajes
+    call screen character_select_screen
 
-    scene bg room
+    # Una vez seleccionado el personaje en la pantalla, el flujo continúa aquí
+    jump loop_principal_dia
 
-    # Muestra un personaje: Se usa un marcador de posición. Es posible
-    # reemplazarlo añadiendo un archivo llamado "eileen happy.png" al directorio
-    # 'images'.
 
-    show eileen happy
 
-    # Presenta las líneas del diálogo.
+# ==============================================================================
+# BUCLE PRINCIPAL Y CARGA DE DATOS DEL PERSONAJE
+# ==============================================================================
 
-    e "Has creado un nuevo juego Ren'Py."
+label cargar_personaje(char_id):
+    $ current_character_id = char_id
+    $ current_character_name = CHARACTERS[char_id]["name"]
+    $ current_system_prompt = CHARACTERS[char_id]["system_prompt"]
+    
+    # Notificación en consola de desarrollo
+    $ renpy.log(f"Personaje cargado: {current_character_name}")
+    return
 
-    e "Añade una historia, imágenes y música, ¡y puedes presentarlo al mundo!"
-
-    # Finaliza el juego:
+label loop_principal_dia:
+    scene bedroom with dissolve
+    
+    "Has seleccionado a [current_character_name]."
+    "Día [current_day] - Puntos de afecto actuales: [pts_afecto]."
+    
+    # Fin del prototipo
 
     return
