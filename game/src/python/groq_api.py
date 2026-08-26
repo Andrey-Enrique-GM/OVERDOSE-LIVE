@@ -10,12 +10,10 @@ URL_API_GROQ = "https://api.groq.com/openai/v1/chat/completions"
 
 def _obtener_api_key():
     """Busca la clave de API en las variables del sistema o dentro del archivo .env"""
-    # Intentar obtener directamente del sistema
     api_key = os.environ.get("GROQ_API_KEY")
     if api_key:
         return api_key.strip()
 
-    # Buscar manualmente en el archivo .env de la raíz del proyecto
     base_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "..")
     )
@@ -31,7 +29,7 @@ def _obtener_api_key():
     return None
 
 
-def _construir_instrucciones(char_id, fase):
+def _construir_instrucciones(char_id, fase, duracion=5):
     """Construye las instrucciones (system prompt) según el personaje y la fase actual."""
     char_data = CHARACTERS[char_id]
     prompt_base = char_data["system_prompt"]
@@ -47,6 +45,23 @@ def _construir_instrucciones(char_id, fase):
         instrucciones += (
             "Evalúa la propuesta del stream hecha por el usuario. Responde en JSON con las llaves: "
             "'dialogo', 'expresion', 'puntos_stream' (-1, 0, 1)."
+        )
+    elif fase == "simular_stream":
+        instrucciones += (
+            f"Estás en plena transmisión EN VIVO (Stream). Genera exactamente {duracion} momentos/secuencias consecutivas del stream.\n"
+            "Responde en formato JSON estricto con el siguiente esquema exacto:\n"
+            "{\n"
+            "  'resultado_stream': int (-1 si el stream fue un desastre/fracaso, 0 si fue regular/neutro, 1 si fue un gran éxito),\n"
+            "  'eventos': [\n"
+            f"    // Lista de exactamente {duracion} objetos:\n"
+            "    {\n"
+            "      'dialogo': 'Lo que dice la streamer en voz alta a su audiencia en este turno',\n"
+            "      'expresion': 'happy | excited | neutral | pout | shocked | embarrassed',\n"
+            "      'viewer_name': 'Nombre de un espectador aleatorio en el chat (ej. Anonimo777, OtakuPro, SimpLord)',\n"
+            "      'viewer_comment': 'Mensaje corto enviado por ese espectador en el chat del stream'\n"
+            "    }\n"
+            "  ]\n"
+            "}"
         )
 
     return instrucciones
@@ -70,7 +85,7 @@ def _enviar_solicitud_http(payload, api_key):
         return json.loads(contenido_texto)
 
 
-def consultar_groq(char_id, prompt_usuario, fase, contexto_extra=""):
+def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5):
     """Función principal: Valida entradas, prepara la consulta y obtiene la respuesta de Groq."""
     if char_id not in CHARACTERS:
         print(f"[ERROR GROQ]: El personaje '{char_id}' no existe.")
@@ -81,22 +96,20 @@ def consultar_groq(char_id, prompt_usuario, fase, contexto_extra=""):
         print("[ERROR GROQ]: No se encontró la variable GROQ_API_KEY.")
         return {}
 
-    # Construcción de la solicitud
-    instrucciones = _construir_instrucciones(char_id, fase)
+    instrucciones = _construir_instrucciones(char_id, fase, duracion)
     payload = {
         "model": "openai/gpt-oss-120b",
         "messages": [
             {"role": "system", "content": instrucciones},
             {
                 "role": "user",
-                "content": f"{contexto_extra}\nMensaje del manager: {prompt_usuario}",
+                "content": f"{contexto_extra}\nTema/Propuesta del stream: {prompt_usuario}",
             },
         ],
         "temperature": 0.7,
         "response_format": {"type": "json_object"},
     }
 
-    # Envío y manejo de errores
     try:
         return _enviar_solicitud_http(payload, api_key)
     except urllib.error.HTTPError as error:

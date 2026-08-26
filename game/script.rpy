@@ -132,4 +132,30 @@ label loop_principal_dia:
     "Reacción de [current_character_name]: [res_dialogo_eval]"
     "Resumen mañanero — Puntos Afecto: [pts_afecto] | Puntos Stream: [pts_stream]."
 
+    # Mostrar respuesta final en la pantalla del teléfono antes de guardar el móvil
+    "[current_character_name] en el chat:" "[res_dialogo_eval]"
+
+    # TRANSICIÓN E INICIO DEL STREAMING EN VIVO
+    "Guardas tu teléfono. Es hora de preparar el setup de transmisión..."
+
+    # setup de streaming (aun no tengo ese fondooo)
+    scene stream_room with dissolve
+
+    "Conectas la cámara y abres el software de transmisión."
+    "Tema programado para hoy: '[idea_stream_user]'"
+
+    # SIMULACIÓN DE STREAM EN VIVO
+    call iniciar_simulacion_stream(idea_stream_user)
+
+    # RESUMEN DEL DÍA Y PROGRESIÓN
+    scene bedroom with dissolve
+
+    "Termina la transmisión y apagas las luces del estudio."
+    "Resumen del Día [current_day]:"
+    "- Puntos de Afecto con [current_character_name]: [pts_afecto]"
+    "- Puntos de Rendimiento del Stream: [pts_stream]"
+
+    $ current_day += 1
+    "Vas a descansar..."
+
     return
