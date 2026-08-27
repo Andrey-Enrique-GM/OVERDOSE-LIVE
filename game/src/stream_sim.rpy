@@ -1,6 +1,4 @@
-# ==============================================================================
 # SISTEMA Y PANTALLA DE SIMULACIÓN DE STREAM EN VIVO
-# ==============================================================================
 
 # Variables de estado del stream
 default stream_live_chat = []
@@ -52,13 +50,13 @@ screen stream_overlay_screen(char_name):
                             text "[msg]" color "#ffffff" size 16
 
 
-
 # LÓGICA DE CONTROL DEL STREAMING (LABEL)
 label iniciar_simulacion_stream(idea_stream):
     # Seleccionar número aleatorio de eventos para la duración (entre 3 y 10)
     $ duracion_stream = renpy.random.randint(3, 10)
     $ stream_viewers_count = renpy.random.randint(800, 2500)
     $ stream_live_chat = []
+    $ prev_expression = ""
     
     "Preparando la transmisión en vivo sobre: '[idea_stream]'..."
     "Duración estimada del stream: [duracion_stream] bloques."
@@ -80,7 +78,7 @@ label iniciar_simulacion_stream(idea_stream):
             },
             {
                 "dialogo": "Estamos probando cosas geniales hoy.",
-                "expresion": "excited",
+                "expresion": "smile",
                 "viewer_name": "Anonimo",
                 "viewer_comment": "<3 <3"
             },
@@ -104,7 +102,21 @@ label iniciar_simulacion_stream(idea_stream):
         $ evt_vname = evt.get("viewer_name", "Viewer")
         $ evt_vcomment = evt.get("viewer_comment", "...")
 
-        # Actualizar estado de la escena
+        # Construir el nombre del tag de la imagen declarada (ej: "airi happy", "ruka angry")
+        $ image_tag_name = f"{current_character_id} {evt_expresion}"
+        
+        # Si la expresión recibida no está definida para la personaje, usar la neutral por defecto
+        if not renpy.has_image(image_tag_name):
+            $ evt_expresion = "neutral"
+            $ image_tag_name = f"{current_character_id} neutral"
+
+        # Mostrar la imagen a la izquierda con la transición suave qdissolve si cambia la expresión
+        if evt_expresion != prev_expression:
+            $ renpy.show(image_tag_name, at_list=[left])
+            $ renpy.with_statement(qdissolve)
+            $ prev_expression = evt_expresion
+
+        # Actualizar estado de la escena y chat en vivo
         $ current_streamer_expression = evt_expresion
         $ stream_live_chat.append((evt_vname, evt_vcomment))
         
@@ -120,7 +132,9 @@ label iniciar_simulacion_stream(idea_stream):
 
         $ idx += 1
 
-    # Ocultar overlay y procesar resultado final
+    # Ocultar la personaje y la interfaz del stream al finalizar
+    $ renpy.hide(current_character_id)
+    $ renpy.with_statement(qdissolve)
     hide screen stream_overlay_screen
 
     # Aplicar variación a la variable global pts_stream (-1, 0, +1)

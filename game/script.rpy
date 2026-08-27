@@ -40,6 +40,9 @@ python early:
     from src.python.character_prompts import CHARACTERS
     from src.python.groq_api import consultar_groq
 
+# Aqui se define la transicion rapida para el cambio de sprite
+define qdissolve = Dissolve(0.25)
+
 
 
 # ==============================================================================
@@ -129,11 +132,11 @@ label loop_principal_dia:
         $ chat_history.append({"sender": "char", "text": res_dialogo_eval, "expresion": res_expresion_eval})
 
     # Mostrar la última reacción en pantalla antes de finalizar el prototipo
-    "Reacción de [current_character_name]: [res_dialogo_eval]"
+    #"Reacción de [current_character_name]: [res_dialogo_eval]"
     "Resumen mañanero — Puntos Afecto: [pts_afecto] | Puntos Stream: [pts_stream]."
 
     # Mostrar respuesta final en la pantalla del teléfono antes de guardar el móvil
-    "[current_character_name] en el chat:" "[res_dialogo_eval]"
+    "[current_character_name]" "[res_dialogo_eval]"
 
     # TRANSICIÓN E INICIO DEL STREAMING EN VIVO
     "Guardas tu teléfono. Es hora de preparar el setup de transmisión..."
