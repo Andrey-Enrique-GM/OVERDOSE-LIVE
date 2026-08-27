@@ -80,7 +80,11 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
 
                 textbutton "Enviar":
                     ysize 40
-                    action Return(input_msg)
+                    if input_msg.strip() != "":
+                        action Return(input_msg)
+                    else:
+                        action None
+
 
 style input_phone_style:
     color "#ffffff"

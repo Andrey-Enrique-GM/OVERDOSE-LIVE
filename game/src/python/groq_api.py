@@ -3,7 +3,17 @@ import os
 import ssl
 import urllib.error
 import urllib.request
-from src.python.character_prompts import CHARACTERS
+
+# Importación robusta compatible dentro y fuera del entorno de Ren'Py
+try:
+    from src.python.character_prompts import CHARACTERS
+except ModuleNotFoundError:
+    try:
+        from character_prompts import CHARACTERS
+    except ModuleNotFoundError:
+        import sys
+        sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+        from character_prompts import CHARACTERS
 
 URL_API_GROQ = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -14,6 +24,7 @@ def _obtener_api_key():
     if api_key:
         return api_key.strip()
 
+    # Buscar en directorio raíz 3 niveles arriba desde src/python/
     base_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "..")
     )

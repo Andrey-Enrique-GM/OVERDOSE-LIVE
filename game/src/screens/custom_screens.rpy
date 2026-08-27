@@ -40,7 +40,7 @@ screen character_select_screen():
             background Solid("#1e1e24")
             hover_background Solid("#2b2b36")
 
-            hovered [Play("sound", "audio/UI/Retro7.wav"), SetScreenVariable("char_hover", "airi")]
+            hovered SetScreenVariable("char_hover", "airi")
             unhovered SetScreenVariable("char_hover", None)
             
             if persistent.unlocked_airi:
@@ -81,7 +81,7 @@ screen character_select_screen():
             background Solid("#1e1e24")
             hover_background Solid("#2b2b36")
 
-            hovered [Play("sound", "audio/UI/Retro7.wav"), SetScreenVariable("char_hover", "ruka")]
+            hovered SetScreenVariable("char_hover", "ruka")
             unhovered SetScreenVariable("char_hover", None)
 
             if persistent.unlocked_ruka:
@@ -122,7 +122,7 @@ screen character_select_screen():
             background Solid("#1e1e24")
             hover_background Solid("#2b2b36")
 
-            hovered [Play("sound", "audio/UI/Retro7.wav"), SetScreenVariable("char_hover", "kaori")]
+            hovered SetScreenVariable("char_hover", "kaori")
             unhovered SetScreenVariable("char_hover", None)
 
             if persistent.unlocked_kaori:
