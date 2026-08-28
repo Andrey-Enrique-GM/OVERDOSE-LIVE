@@ -54,34 +54,48 @@ define gui.text_color = '#404040'
 define gui.interface_text_color = '#404040'
 
 
+
+
+
+
 ## Tipos y tamaños de letra ####################################################
 
-## El tipo de letra del texto del juego
-define gui.text_font = "DejaVuSans.ttf"
+## La fuente utilizada para el texto de los diálogos de los personajes
+define gui.text_font = "gui/fonts/playtime.ttf"
 
-## El tipo de letra de los nombres de personajes
-define gui.name_text_font = "DejaVuSans.ttf"
+## La fuente utilizada para los nombres de los personajes
+define gui.name_text_font = "gui/fonts/playtime.ttf"
 
-## El tipo de letra del texto externo al juego.
-define gui.interface_text_font = "DejaVuSans.ttf"
+## La fuente utilizada para la interfaz de usuario (menús, opciones)
+define gui.interface_text_font = "gui/fonts/playtime.ttf"
 
 ## El tamaño normal del texto del diálogo.
-define gui.text_size = 33
+##define gui.text_size = 33
+define gui.text_size = 40
 
 ## El tamaño de los nombres de los personajes
-define gui.name_text_size = 45
+##define gui.name_text_size = 45
+define gui.name_text_size = 50
 
 ## El tamaño del texto en la interfaz.
-define gui.interface_text_size = 33
+##define gui.interface_text_size = 33
+define gui.interface_text_size = 40
 
 ## El tamaño de etiquetas en la interfaz.
-define gui.label_text_size = 36
+##define gui.label_text_size = 36
+define gui.label_text_size = 43
 
 ## El tamaño del texto en las notificaciones.
-define gui.notify_text_size = 24
+##define gui.notify_text_size = 24
+define gui.notify_text_size = 30
 
 ## El tamaño del título del juego.
-define gui.title_text_size = 75
+##define gui.title_text_size = 75
+define gui.title_text_size = 90
+
+
+
+
 
 
 ## Menú principal y menús del juego ############################################
@@ -101,7 +115,11 @@ define gui.textbox_height = 278
 
 ## Colocación vertical de la caja de texto en la pantalla. 0.0 para la parte
 ## superior, 0.5 para el centro y 1.0 para la parte inferior.
-define gui.textbox_yalign = 1.0
+define gui.textbox_yalign = 0.975
+
+
+
+
 
 
 ## Colocación del nombre del personaje hablante, relativa a la caja de texto.

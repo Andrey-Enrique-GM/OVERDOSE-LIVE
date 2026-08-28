@@ -261,7 +261,18 @@ screen quick_menu():
 init python:
     config.overlay_screens.append("quick_menu")
 
-default quick_menu = True
+
+
+
+
+
+# Desactiva el menú rápido por defecto, para que no aparezca
+default quick_menu = False
+
+
+
+
+
 
 style quick_menu is hbox
 style quick_button is default

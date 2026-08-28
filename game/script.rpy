@@ -40,6 +40,10 @@ python early:
     from src.python.character_prompts import CHARACTERS
     from src.python.groq_api import consultar_groq
 
+
+# Aqui se define la fuente que se usará en el juego
+define gui.playtime_font = "gui/fonts/playtime.ttf" 
+
 # Aqui se define la transicion rapida para el cambio de sprite
 define qdissolve = Dissolve(0.25)
 
