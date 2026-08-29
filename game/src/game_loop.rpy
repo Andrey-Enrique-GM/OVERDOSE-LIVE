@@ -1,31 +1,24 @@
 # ==============================================================================
-# BUCLE PRINCIPAL DE DÍA: MAÑANA (1/3), STREAM (2/3) Y NOCHE (3/3)
+# BUCLE PRINCIPAL DE DÍA: CHAT 1, STREAM Y CHAT 2 (NOCHE)
 # ==============================================================================
-
-label cargar_personaje(char_id):
-    $ current_character_id = char_id
-    $ current_character_name = CHARACTERS[char_id]["name"]
-    $ current_system_prompt = CHARACTERS[char_id]["system_prompt"]
-    $ renpy.log(f"Personaje cargado: {current_character_name}")
-    return
 
 label loop_principal_dia:
     scene bedroom with dissolve
     
     $ chat_history = []
-    $ current_chat_suffix = "1" # Sprites mañana terminados en 1
+    $ current_chat_suffix = "1"
     
-    # Mostrar sprite neutral inicial del personaje
     call actualizar_sprite_chat(current_character_id, "neutral", suffix="1")
 
-    $ chats_manana_limite = renpy.random.randint(1, 5)
+    # CHAT 1: Cantidad aleatoria entre 1 y 5 turnos
+    $ chats_manana_limite = random.randint(1, 5)
     $ chats_realizados = 0
 
     "Iniciando el Día [current_day] con [current_character_name]."
     "Revisas tu teléfono por la mañana..."
 
     # --------------------------------------------------------------------------
-    # FASE 1/3: CHAT DE LA MAÑANA
+    # FASE 1/3: CHAT 1 (MAÑANA)
     # --------------------------------------------------------------------------
     while chats_realizados < chats_manana_limite:
         $ msgs_restantes = chats_manana_limite - chats_realizados
@@ -35,15 +28,23 @@ label loop_principal_dia:
         $ user_text = _return
 
         if user_text and user_text.strip() != "":
-            $ chat_history.append({"sender": "user", "text": user_text})
-            
-            $ res_json = consultar_groq(current_character_id, user_text, fase="chat")
+            # Consultar pasándole el historial previo para no perder el hilo
+            $ res_json = consultar_groq(
+                current_character_id, 
+                user_text, 
+                fase="chat", 
+                historial=chat_history
+            )
             
             $ res_dialogo = res_json.get("dialogo", "...")
             $ res_expresion = res_json.get("expresion", "neutral")
             $ delta_afecto = int(res_json.get("puntos_afecto", 0))
             
+            # Sumar/Restar Puntos de Afecto según la IA
             $ pts_afecto += delta_afecto
+            
+            # Guardar en el historial de la sesión
+            $ chat_history.append({"sender": "user", "text": user_text})
             $ chat_history.append({"sender": "char", "text": res_dialogo, "expresion": res_expresion})
             
             call actualizar_sprite_chat(current_character_id, res_expresion, suffix="1")
@@ -79,39 +80,41 @@ label loop_principal_dia:
     call ocultar_sprites_chat
 
     # --------------------------------------------------------------------------
-    # FASE 2/3: SIMULACIÓN DE STREAM EN VIVO
+    # FASE 2/3: SIMULACIÓN DE STREAM EN VIVO (3 a 10 Bloques)
     # --------------------------------------------------------------------------
     scene stream_room with dissolve
 
     "Conectas la cámara y abres el software de transmisión."
     "Tema programado para hoy: '[idea_stream_user]'"
 
-    call iniciar_simulacion_stream(idea_stream_user)
+    # Genera aleatoriamente entre 3 y 10 bloques para el stream en una sola llamada a la API
+    $ duracion_live = random.randint(3, 10)
+    call iniciar_simulacion_stream(idea_stream_user, duracion_live)
     $ resultado_puntos_stream = _return
 
-    # SÍNTESIS Y RESUMEN DEL DÍA PARA MEMORIA IA
+    # SÍNTESIS Y RESUMEN DEL DÍA (CHAT 1 + LIVE)
     scene bedroom with dissolve
 
     "El stream ha terminado. Tomas un respiro mientras la noche empieza a caer..."
 
-    # Generación de resumen sin dependencias externas
     $ res_resumen = consultar_groq(
         current_character_id, 
         idea_stream_user, 
         fase="generar_resumen", 
-        contexto_extra=f"Puntos obtenidos en stream: {resultado_puntos_stream}"
+        contexto_extra=f"Charlas de la mañana: {json.dumps(chat_history)}. Puntos stream: {resultado_puntos_stream}"
     )
     $ resumen_dia_actual = res_resumen.get("resumen", f"Hablaron en la mañana y transmitieron sobre {idea_stream_user}.")
 
     # --------------------------------------------------------------------------
-    # FASE 3/3: CHAT ANTES DE DORMIR (NOCHE)
+    # FASE 3/3: CHAT 2 (NOCHE: 1 a 5 turnos)
     # --------------------------------------------------------------------------
     $ current_chat_suffix = "2"
     $ chat_history_noche = []
     
     call actualizar_sprite_chat(current_character_id, "neutral", suffix="2")
 
-    $ chats_noche_limite = renpy.random.randint(1, 4)
+    # Chat 2: Cantidad aleatoria entre 1 y 5 turnos
+    $ chats_noche_limite = random.randint(1, 5)
     $ chats_noche_realizados = 0
 
     "Ya acostado en tu cama, ves una notificación en tu teléfono antes de dormir..."
@@ -124,28 +127,31 @@ label loop_principal_dia:
         $ user_text = _return
 
         if user_text and user_text.strip() != "":
-            $ chat_history_noche.append({"sender": "user", "text": user_text})
-            
-            # Consulta a Groq pasando el resumen acumulado de la jornada
+            # Consultar enviando el resumen del día Y el historial propio del Chat 2
             $ res_json = consultar_groq(
                 current_character_id, 
                 user_text, 
                 fase="chat_noche", 
-                resumen_dia=resumen_dia_actual
+                resumen_dia=resumen_dia_actual,
+                historial=chat_history_noche
             )
             
             $ res_dialogo = res_json.get("dialogo", "Buenas noches...")
             $ res_expresion = res_json.get("expresion", "neutral")
             $ delta_afecto = int(res_json.get("puntos_afecto", 0))
             
+            # Sumar/Restar Puntos de Afecto también en el Chat 2
             $ pts_afecto += delta_afecto
+            
+            # Guardar hilo conversacional del Chat 2
+            $ chat_history_noche.append({"sender": "user", "text": user_text})
             $ chat_history_noche.append({"sender": "char", "text": res_dialogo, "expresion": res_expresion})
             
             call actualizar_sprite_chat(current_character_id, res_expresion, suffix="2")
             $ chats_noche_realizados += 1
 
     # --------------------------------------------------------------------------
-    # RESUMEN DEL DÍA Y PROGRESIÓN AL SIGUIENTE DÍA
+    # RESUMEN Y FINALIZACIÓN DEL DÍA
     # --------------------------------------------------------------------------
     call ocultar_sprites_chat
 

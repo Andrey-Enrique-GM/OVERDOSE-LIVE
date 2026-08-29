@@ -50,6 +50,7 @@ def _construir_instrucciones(char_id, fase, duracion=5, resumen_dia=""):
     if fase == "chat":
         instrucciones += (
             "Estás en un chat mañanero casual por smartphone con el usuario.\n"
+            "Evalúa la actitud del usuario. Puedes otorgar (+1), quitar (-1) o dejar neutral (0) los puntos de afecto según cómo te sientas conversando.\n"
             "Responde en formato JSON estricto con las llaves: "
             "'dialogo', 'expresion', 'puntos_afecto' (-1, 0, 1)."
         )
@@ -77,14 +78,14 @@ def _construir_instrucciones(char_id, fase, duracion=5, resumen_dia=""):
         )
     elif fase == "generar_resumen":
         instrucciones += (
-            "Resume en 2 o 3 oraciones cortas lo más relevante del día transcurrido (charla matutina y resultado del stream).\n"
+            "Sintetiza lo que ocurrió hoy en la mañana y en el stream en 2 o 3 oraciones clave para la memoria nocturna del personaje.\n"
             "Responde ÚNICAMENTE en JSON con la llave: 'resumen'."
         )
     elif fase == "chat_noche":
         instrucciones += (
-            f"CONTEXTO DE LO QUE SUCEDIÓ HOY:\n{resumen_dia}\n\n"
-            "Es la noche y están chateando por teléfono antes de ir a dormir. Mantén el tono de tu personaje "
-            "teniendo en cuenta lo que sucedió hoy en el directo y en la mañana. Tu respuesta debe ser acogedora e íntima.\n"
+            f"CONTEXTO DE LO OCURRIDO HOY (CHAT MAÑANA Y STREAM):\n{resumen_dia}\n\n"
+            "Es la noche y están chateando por teléfono antes de ir a dormir. Recuerda lo que hicieron hoy en el directo y en la mañana.\n"
+            "Evalúa la interacción del usuario: puedes otorgar (+1), quitar (-1) o dejar neutral (0) los puntos de afecto según la conversación nocturna.\n"
             "Responde en formato JSON estricto con las llaves: 'dialogo', 'expresion', 'puntos_afecto' (-1, 0, 1)."
         )
 
@@ -109,8 +110,8 @@ def _enviar_solicitud_http(payload, api_key):
         return json.loads(contenido_texto)
 
 
-def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5, resumen_dia=""):
-    """Función principal: Valida entradas, prepara la consulta y obtiene la respuesta de Groq."""
+def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5, resumen_dia="", historial=None):
+    """Función principal: Valida entradas, construye el historial de mensajes y obtiene la respuesta de Groq."""
     if char_id not in CHARACTERS:
         print(f"[ERROR GROQ]: El personaje '{char_id}' no existe.")
         return {}
@@ -122,21 +123,24 @@ def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5,
 
     instrucciones = _construir_instrucciones(char_id, fase, duracion, resumen_dia)
     
-    # Manejo del prompt/mensaje de entrada según la fase
-    if fase == "generar_resumen":
-        contenido_user = f"Resumen del stream previo. {contexto_extra}. Tema: {prompt_usuario}"
-    elif fase == "chat_noche":
-        contenido_user = prompt_usuario
+    # Construir la lista de mensajes con el historial conversacional si existe
+    messages = [{"role": "system", "content": instrucciones}]
+
+    if (fase in ["chat", "chat_noche"]) and historial:
+        # Añadir historial acumulado para mantener el hilo de la conversación
+        for msg in historial:
+            role = "user" if msg["sender"] == "user" else "assistant"
+            messages.append({"role": role, "content": msg["text"]})
+        # Añadir el mensaje actual del usuario
+        messages.append({"role": "user", "content": prompt_usuario})
+    elif fase == "generar_resumen":
+        messages.append({"role": "user", "content": f"Resumen conversación y stream. {contexto_extra}. Tema stream: {prompt_usuario}"})
     else:
-        contenido_user = f"{contexto_extra}\nEntrada usuario / Tema: {prompt_usuario}"
+        messages.append({"role": "user", "content": f"{contexto_extra}\nEntrada usuario / Tema: {prompt_usuario}"})
 
     payload = {
-        # Modelo de IA a utilizar
         "model": "openai/gpt-oss-120b",
-        "messages": [
-            {"role": "system", "content": instrucciones},
-            {"role": "user", "content": contenido_user},
-        ],
+        "messages": messages,
         "temperature": 0.7,
         "response_format": {"type": "json_object"},
     }

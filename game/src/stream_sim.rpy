@@ -54,17 +54,15 @@ screen stream_overlay_screen(char_name):
 
 # LÓGICA DE CONTROL DEL STREAMING (LABEL)
 label iniciar_simulacion_stream(idea_stream):
-    # Seleccionar número aleatorio de eventos para la duración (entre 3 y 10)
-    $ duracion_stream = renpy.random.randint(3, 10)
-    $ stream_viewers_count = renpy.random.randint(800, 2500)
+    $ stream_viewers_count = random.randint(800, 2500)
     $ stream_live_chat = []
     $ prev_expression = ""
     
     "Preparando la transmisión en vivo sobre: '[idea_stream]'..."
-    "Duración estimada del stream: [duracion_stream] bloques."
+    "Duración estimada del stream: [duracion_live] bloques."
 
     # Solicitar la simulación completa en un único mensaje JSON a la API
-    $ res_stream = consultar_groq(current_character_id, idea_stream, fase="simular_stream", duracion=duracion_stream)
+    $ res_stream = consultar_groq(current_character_id, idea_stream, fase="simular_stream", duracion=duracion_live)
     
     $ eventos_stream = res_stream.get("eventos", [])
     $ resultado_puntos = int(res_stream.get("resultado_stream", 0))
@@ -104,15 +102,15 @@ label iniciar_simulacion_stream(idea_stream):
         $ evt_vname = evt.get("viewer_name", "Viewer")
         $ evt_vcomment = evt.get("viewer_comment", "...")
 
-        # Construir el nombre del tag de la imagen declarada (ej: "airi happy", "ruka angry")
+        # Construir el nombre del tag de la imagen declarada
         $ image_tag_name = f"{current_character_id} {evt_expresion}"
         
-        # Si la expresión recibida no está definida para la personaje, usar la neutral por defecto
+        # Si la expresión recibida no está definida, usar neutral
         if not renpy.has_image(image_tag_name):
             $ evt_expresion = "neutral"
             $ image_tag_name = f"{current_character_id} neutral"
 
-        # Mostrar la imagen a la izquierda con la transición suave qdissolve si cambia la expresión
+        # Mostrar la imagen a la izquierda con la transición qdissolve si cambia
         if evt_expresion != prev_expression:
             $ renpy.show(image_tag_name, at_list=[left])
             $ renpy.with_statement(qdissolve)
@@ -122,12 +120,12 @@ label iniciar_simulacion_stream(idea_stream):
         $ current_streamer_expression = evt_expresion
         $ stream_live_chat.append((evt_vname, evt_vcomment))
         
-        # Mantener solo los últimos 8 mensajes en el chat para no desbordar
+        # Mantener solo los últimos 8 mensajes en el chat
         if len(stream_live_chat) > 8:
             $ stream_live_chat.pop(0)
 
         # Fluctuación orgánica de espectadores
-        $ stream_viewers_count += renpy.random.randint(-15, 30)
+        $ stream_viewers_count += random.randint(-15, 30)
 
         # Diálogo interactivo del personaje
         "[current_character_name]" "[evt_dialogo]"
@@ -154,4 +152,4 @@ label iniciar_simulacion_stream(idea_stream):
     else:
         "El stream terminó sin pena ni gloria (+0 puntos)."
 
-    return
+    return resultado_puntos

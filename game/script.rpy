@@ -19,6 +19,8 @@ default resumen_dia_actual = ""    # Almacena el contexto generado para el chat 
 python early:
     import sys
     import os
+    import json
+    import random
 
     game_dir = config.gamedir
     
@@ -86,6 +88,20 @@ label ocultar_sprites_chat():
 
 
 # ==============================================================================
+# CARGAR PERSONAJE SELECCIONADO
+# ==============================================================================
+
+label cargar_personaje(char_id):
+    $ current_character_id = char_id
+    if char_id in CHARACTERS:
+        $ current_character_name = CHARACTERS[char_id]["name"]
+        $ current_system_prompt = CHARACTERS[char_id]["system_prompt"]
+    else:
+        $ current_character_name = char_id.capitalize()
+    return
+
+
+# ==============================================================================
 # PUNTO DE ENTRADA AL INICIAR NUEVA PARTIDA
 # ==============================================================================
 
@@ -96,4 +112,9 @@ label start:
     $ resumen_dia_actual = ""
 
     call screen character_select_screen
+    
+    # Si la pantalla retorna el ID mediante Return("airi"), se procesa aquí:
+    if _return:
+        call cargar_personaje(_return)
+
     jump loop_principal_dia
