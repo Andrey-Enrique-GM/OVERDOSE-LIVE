@@ -1,7 +1,16 @@
-# Lista global para guardar la conversación del smartphone
+# ==============================================================================
+# SISTEMA DE CHAT DE SMARTPHONE
+# ==============================================================================
+
+# Variables de estado del chat
 default chat_history = []
 default input_msg = ""
+default current_chat_expression = "neutral"
 
+
+# ------------------------------------------------------------------------------
+# INTERFAZ DE USUARIO: PANTALLA DE CHAT SMARTPHONE
+# ------------------------------------------------------------------------------
 screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=False):
     modal True
 
@@ -11,7 +20,7 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
         yalign 0.5
         xsize 420
         ysize 680
-        background Solid("#121b22") # Fondo oscuro tipo WhatsApp
+        background Solid("#121b22")
 
         vbox:
             spacing 10
@@ -25,11 +34,11 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
                 hbox:
                     align (0.05, 0.5)
                     spacing 10
-                    text "[char_name]" size 20 bold True color "#ffffff" yalign 0.5
+                    text "[char_name]" size 30 bold True color "#ffffff" yalign 0.5
                     if not es_evaluacion_stream:
-                        text "(Mensajes: [mensajes_restantes])" size 14 color "#a6adc8" yalign 0.5
+                        text "(Mensajes: [mensajes_restantes])" size 18 color "#a6adc8" yalign 0.5
                     else:
-                        text "(Propuesta de Stream)" size 14 color "#00ffcc" yalign 0.5
+                        text "(Propuesta de Stream)" size 18 color "#00ffcc" yalign 0.5
 
             # Área de Historial de Conversación (Scrollable)
             viewport:
@@ -46,7 +55,6 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
 
                     for item in chat_history:
                         if item["sender"] == "user":
-                            # Mensaje enviado por el Manager (Alineado a la derecha)
                             frame:
                                 xalign 0.95
                                 xmaximum 300
@@ -54,7 +62,6 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
                                 padding (10, 8)
                                 text item["text"] size 16 color "#ffffff"
                         else:
-                            # Mensaje enviado por el Personaje (Alineado a la izquierda)
                             frame:
                                 xalign 0.05
                                 xmaximum 300
@@ -85,9 +92,7 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
                     else:
                         action None
 
-
 style input_phone_style:
     color "#ffffff"
     background Solid("#2a3942")
     padding (8, 8)
-    

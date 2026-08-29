@@ -13,7 +13,11 @@ label loop_principal_dia:
     scene bedroom with dissolve
     
     $ chat_history = []
+    $ current_chat_suffix = "1" # Chat mañanero usa sprites terminados en 1
     
+    # Mostrar sprite inicial neutral del personaje al iniciar la conversación
+    call actualizar_sprite_chat(current_character_id, "neutral", suffix="1")
+
     # 1. Generar cantidad aleatoria de interacciones (entre 1 y 5)
     $ chats_manana_limite = renpy.random.randint(1, 5)
     $ chats_realizados = 0
@@ -46,11 +50,16 @@ label loop_principal_dia:
             
             # Agregar respuesta del personaje al historial
             $ chat_history.append({"sender": "char", "text": res_dialogo, "expresion": res_expresion})
+            
+            # ACTUALIZAR SPRITE DINÁMICO SEGÚN LA RESPUESTA DE LA IA
+            call actualizar_sprite_chat(current_character_id, res_expresion, suffix="1")
+            
             $ chats_realizados += 1
 
     # FASE PREGUNTA Y EVALUACIÓN DE IDEA DE STREAM
     $ chat_history.append({"sender": "char", "text": "Y... ¿Qué idea tienes para el stream de hoy?", "expresion": "curious"})
-    
+    call actualizar_sprite_chat(current_character_id, "curious", suffix="1")
+
     $ input_msg = ""
     call screen phone_chat_screen(current_character_name, 0, es_evaluacion_stream=True)
     $ idea_stream_user = _return
@@ -69,17 +78,20 @@ label loop_principal_dia:
         $ pts_stream += delta_stream
         
         $ chat_history.append({"sender": "char", "text": res_dialogo_eval, "expresion": res_expresion_eval})
+        
+        # Actualizar expresión con la respuesta de evaluación
+        call actualizar_sprite_chat(current_character_id, res_expresion_eval, suffix="1")
 
-    # Mostrar la última reacción en pantalla antes de finalizar el prototipo
+    # Resumen rápido del estado
     "Resumen mañanero — Puntos Afecto: [pts_afecto] | Puntos Stream: [pts_stream]."
-
-    # Mostrar respuesta final en la pantalla del teléfono antes de guardar el móvil
-    "[current_character_name]" "[res_dialogo_eval]"
 
     # TRANSICIÓN E INICIO DEL STREAMING EN VIVO
     "Guardas tu teléfono. Es hora de preparar el setup de transmisión..."
+    
+    # Ocultar los sprites del chat antes de cambiar de ambiente
+    call ocultar_sprites_chat
 
-    # setup de streaming
+    # Setup de streaming
     scene stream_room with dissolve
 
     "Conectas la cámara y abres el software de transmisión."

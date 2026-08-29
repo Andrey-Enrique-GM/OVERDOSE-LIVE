@@ -13,6 +13,7 @@ default current_system_prompt = ""
 default pts_afecto = 0
 default pts_stream = 0
 default current_day = 1
+default current_chat_suffix = "1" # "1" para mañana, "2" para noche
 
 python early:
     import sys
@@ -41,12 +42,46 @@ python early:
     from src.python.groq_api import consultar_groq
 
 
-# Aqui se define la fuente que se usará en el juego
+# Configuración visual e imágenes de interfaz
 define gui.playtime_font = "gui/fonts/playtime.ttf" 
-
-# Aqui se define la transicion rapida para el cambio de sprite
 define qdissolve = Dissolve(0.25)
 
+
+# ==============================================================================
+# HELPER: ACTUALIZAR SPRITE DEL CHAT (BASE + EXPRESIÓN DINÁMICA)
+# ==============================================================================
+
+label actualizar_sprite_chat(char_id, expresion, suffix=None):
+    $ suffix_to_use = suffix if suffix else current_chat_suffix
+
+    # Cargar Sprite Base con Sufijo
+    $ base_tag = f"{char_id}{suffix_to_use}_base"
+    if renpy.has_image(base_tag):
+        $ renpy.show(base_tag, at_list=[left], tag=f"{char_id}_chat_body")
+
+    # Validar que la Expresión con Sufijo exista
+    $ face_tag = f"{char_id}{suffix_to_use}_face_{expresion}"
+    if not renpy.has_image(face_tag):
+        $ expresion = "neutral"
+        $ face_tag = f"{char_id}{suffix_to_use}_face_neutral"
+
+    # Aplicar transición de cara usando Tag único para reemplazo directo
+    $ tag_cara_generica = f"{char_id}_chat_face"
+    if renpy.has_image(face_tag):
+        $ renpy.show(face_tag, at_list=[left], tag=tag_cara_generica)
+        $ renpy.with_statement(qdissolve)
+
+    $ current_chat_expression = expresion
+    return
+
+
+label ocultar_sprites_chat():
+    $ body_tag = f"{current_character_id}_chat_body"
+    $ face_tag = f"{current_character_id}_chat_face"
+    $ renpy.hide(body_tag)
+    $ renpy.hide(face_tag)
+    $ renpy.with_statement(dissolve)
+    return
 
 
 # ==============================================================================
