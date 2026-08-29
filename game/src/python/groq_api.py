@@ -40,7 +40,7 @@ def _obtener_api_key():
     return None
 
 
-def _construir_instrucciones(char_id, fase, duracion=5):
+def _construir_instrucciones(char_id, fase, duracion=5, resumen_dia=""):
     """Construye las instrucciones (system prompt) según el personaje y la fase actual."""
     char_data = CHARACTERS[char_id]
     prompt_base = char_data["system_prompt"]
@@ -49,6 +49,7 @@ def _construir_instrucciones(char_id, fase, duracion=5):
 
     if fase == "chat":
         instrucciones += (
+            "Estás en un chat mañanero casual por smartphone con el usuario.\n"
             "Responde en formato JSON estricto con las llaves: "
             "'dialogo', 'expresion', 'puntos_afecto' (-1, 0, 1)."
         )
@@ -74,6 +75,18 @@ def _construir_instrucciones(char_id, fase, duracion=5):
             "  ]\n"
             "}"
         )
+    elif fase == "generar_resumen":
+        instrucciones += (
+            "Resume en 2 o 3 oraciones cortas lo más relevante del día transcurrido (charla matutina y resultado del stream).\n"
+            "Responde ÚNICAMENTE en JSON con la llave: 'resumen'."
+        )
+    elif fase == "chat_noche":
+        instrucciones += (
+            f"CONTEXTO DE LO QUE SUCEDIÓ HOY:\n{resumen_dia}\n\n"
+            "Es la noche y están chateando por teléfono antes de ir a dormir. Mantén el tono de tu personaje "
+            "teniendo en cuenta lo que sucedió hoy en el directo y en la mañana. Tu respuesta debe ser acogedora e íntima.\n"
+            "Responde en formato JSON estricto con las llaves: 'dialogo', 'expresion', 'puntos_afecto' (-1, 0, 1)."
+        )
 
     return instrucciones
 
@@ -96,7 +109,7 @@ def _enviar_solicitud_http(payload, api_key):
         return json.loads(contenido_texto)
 
 
-def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5):
+def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5, resumen_dia=""):
     """Función principal: Valida entradas, prepara la consulta y obtiene la respuesta de Groq."""
     if char_id not in CHARACTERS:
         print(f"[ERROR GROQ]: El personaje '{char_id}' no existe.")
@@ -107,15 +120,22 @@ def consultar_groq(char_id, prompt_usuario, fase, contexto_extra="", duracion=5)
         print("[ERROR GROQ]: No se encontró la variable GROQ_API_KEY.")
         return {}
 
-    instrucciones = _construir_instrucciones(char_id, fase, duracion)
+    instrucciones = _construir_instrucciones(char_id, fase, duracion, resumen_dia)
+    
+    # Manejo del prompt/mensaje de entrada según la fase
+    if fase == "generar_resumen":
+        contenido_user = f"Resumen del stream previo. {contexto_extra}. Tema: {prompt_usuario}"
+    elif fase == "chat_noche":
+        contenido_user = prompt_usuario
+    else:
+        contenido_user = f"{contexto_extra}\nEntrada usuario / Tema: {prompt_usuario}"
+
     payload = {
+        # Modelo de IA a utilizar
         "model": "openai/gpt-oss-120b",
         "messages": [
             {"role": "system", "content": instrucciones},
-            {
-                "role": "user",
-                "content": f"{contexto_extra}\nTema/Propuesta del stream: {prompt_usuario}",
-            },
+            {"role": "user", "content": contenido_user},
         ],
         "temperature": 0.7,
         "response_format": {"type": "json_object"},

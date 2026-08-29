@@ -1,26 +1,26 @@
 # ==============================================================================
-# SISTEMA DE CHAT DE SMARTPHONE
+# SISTEMA DE CHAT DE SMARTPHONE (MAÑANA Y NOCHE)
 # ==============================================================================
 
-# Variables de estado del chat
 default chat_history = []
 default input_msg = ""
 default current_chat_expression = "neutral"
 
 
-# ------------------------------------------------------------------------------
-# INTERFAZ DE USUARIO: PANTALLA DE CHAT SMARTPHONE
-# ------------------------------------------------------------------------------
-screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=False):
+screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=False, es_noche=False):
     modal True
 
-    # Marco del Teléfono en el lado derecho de la pantalla
+    # Color de fondo según el momento del día
+    $ frame_bg = "#0f172a" if es_noche else "#121b22"
+    $ header_bg = "#1e1b4b" if es_noche else "#1f2c34"
+    $ header_title = "Chat Nocturno" if es_noche else char_name
+
     frame:
         xalign 0.95
         yalign 0.5
         xsize 420
         ysize 680
-        background Solid("#121b22")
+        background Solid(frame_bg)
 
         vbox:
             spacing 10
@@ -30,17 +30,17 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
             frame:
                 xfill True
                 ysize 60
-                background Solid("#1f2c34")
+                background Solid(header_bg)
                 hbox:
                     align (0.05, 0.5)
                     spacing 10
-                    text "[char_name]" size 30 bold True color "#ffffff" yalign 0.5
+                    text "[header_title]" size 26 bold True color "#ffffff" yalign 0.5
                     if not es_evaluacion_stream:
-                        text "(Mensajes: [mensajes_restantes])" size 18 color "#a6adc8" yalign 0.5
+                        text "(Msgs: [mensajes_restantes])" size 16 color "#a6adc8" yalign 0.5
                     else:
-                        text "(Propuesta de Stream)" size 18 color "#00ffcc" yalign 0.5
+                        text "(Idea Stream)" size 16 color "#00ffcc" yalign 0.5
 
-            # Área de Historial de Conversación (Scrollable)
+            # Área de Historial de Conversación
             viewport:
                 id "chat_vp"
                 xfill True
@@ -53,46 +53,45 @@ screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=Fal
                     xfill True
                     spacing 12
 
-                    for item in chat_history:
+                    $ history_to_show = chat_history_noche if es_noche else chat_history
+
+                    for item in history_to_show:
                         if item["sender"] == "user":
                             frame:
                                 xalign 0.95
                                 xmaximum 300
-                                background Solid("#005c4b")
-                                padding (10, 8)
-                                text item["text"] size 16 color "#ffffff"
+                                background Solid("#005c4b" if not es_noche else "#312e81")
+                                padding (12, 8)
+                                text "[item['text']]" color "#ffffff" size 18
                         else:
                             frame:
                                 xalign 0.05
                                 xmaximum 300
-                                background Solid("#202c33")
-                                padding (10, 8)
-                                vbox:
-                                    text item["text"] size 16 color "#ffffff"
-                                    text "Expresión: " + str(item.get("expresion", "neutral")) size 12 color "#8596a0"
+                                background Solid("#202c33" if not es_noche else "#1e293b")
+                                padding (12, 8)
+                                text "[item['text']]" color "#e9edef" size 18
 
-            # Área de Input de Texto y Envío
-            hbox:
+            # Área de entrada de texto
+            frame:
                 xfill True
-                ysize 60
-                spacing 5
-                
-                input:
-                    value VariableInputValue("input_msg")
-                    length 100
-                    xfill True
-                    ysize 40
-                    copypaste True
-                    style "input_phone_style"
+                ysize 70
+                background Solid(header_bg)
 
-                textbutton "Enviar":
-                    ysize 40
-                    if input_msg.strip() != "":
+                hbox:
+                    align (0.5, 0.5)
+                    spacing 10
+
+                    input:
+                        value VariableInputValue("input_msg")
+                        length 120
+                        pixel_width 280
+                        color "#ffffff"
+                        size 18
+
+                    textbutton "Enviar":
                         action Return(input_msg)
-                    else:
-                        action None
-
-style input_phone_style:
-    color "#ffffff"
-    background Solid("#2a3942")
-    padding (8, 8)
+                        sensitive (len(input_msg.strip()) > 0)
+                        text_color "#00a884"
+                        text_hover_color "#02e7b5"
+                        text_size 18
+                        text_bold True

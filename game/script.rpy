@@ -14,6 +14,7 @@ default pts_afecto = 0
 default pts_stream = 0
 default current_day = 1
 default current_chat_suffix = "1" # "1" para mañana, "2" para noche
+default resumen_dia_actual = ""    # Almacena el contexto generado para el chat nocturno
 
 python early:
     import sys
@@ -54,12 +55,12 @@ define qdissolve = Dissolve(0.25)
 label actualizar_sprite_chat(char_id, expresion, suffix=None):
     $ suffix_to_use = suffix if suffix else current_chat_suffix
 
-    # Cargar Sprite Base usando la convención _bg (ej: airi1_bg, ruka1_bg)
+    # Cargar Sprite Base usando la convención _bg (ej: airi1_bg, airi2_bg)
     $ base_tag = f"{char_id}{suffix_to_use}_bg"
     if renpy.has_image(base_tag):
         $ renpy.show(base_tag, at_list=[left], tag=f"{char_id}_chat_body")
 
-    # Validar que la Expresión con Sufijo exista
+    # Validar que la Expresión con Sufijo exista (ej: airi2_face_happy)
     $ face_tag = f"{char_id}{suffix_to_use}_face_{expresion}"
     if not renpy.has_image(face_tag):
         $ expresion = "neutral"
@@ -92,6 +93,7 @@ label start:
     $ pts_afecto = 0
     $ pts_stream = 0
     $ current_day = 1
+    $ resumen_dia_actual = ""
 
     call screen character_select_screen
     jump loop_principal_dia
