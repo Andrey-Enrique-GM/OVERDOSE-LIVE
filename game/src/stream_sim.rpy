@@ -1,4 +1,6 @@
+# ==============================================================================
 # SISTEMA Y PANTALLA DE SIMULACIÓN DE STREAM EN VIVO
+# ==============================================================================
 
 # Variables de estado del stream
 default stream_live_chat = []

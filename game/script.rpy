@@ -48,14 +48,14 @@ define qdissolve = Dissolve(0.25)
 
 
 # ==============================================================================
-# HELPER: ACTUALIZAR SPRITE DEL CHAT (BASE + EXPRESIÓN DINÁMICA)
+# HELPER: ACTUALIZAR SPRITE DEL CHAT (FONDO + SPRITES INDIVIDUALES)
 # ==============================================================================
 
 label actualizar_sprite_chat(char_id, expresion, suffix=None):
     $ suffix_to_use = suffix if suffix else current_chat_suffix
 
-    # Cargar Sprite Base con Sufijo
-    $ base_tag = f"{char_id}{suffix_to_use}_base"
+    # Cargar Sprite Base usando la convención _bg (ej: airi1_bg, ruka1_bg)
+    $ base_tag = f"{char_id}{suffix_to_use}_bg"
     if renpy.has_image(base_tag):
         $ renpy.show(base_tag, at_list=[left], tag=f"{char_id}_chat_body")
 

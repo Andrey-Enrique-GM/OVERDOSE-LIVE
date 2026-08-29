@@ -9,8 +9,8 @@ image airi happy = "sprites/airi/airi_happy.png"
 image airi neutral = "sprites/airi/airi_neutral.png"
 image airi smile = "sprites/airi/airi_smile.png"
 
-# Sprites para Chat (Base + Expresión/Cara)
-image airi1_base = "events/chat1/airi1/airi1_base.png"
+# Sprites para Chat (Fondo + Sprites)
+image airi1_bg = "bgs/airi1_bg.png"
 image airi1_face_angry = "events/chat1/airi1/airi1_angry.png"
 image airi1_face_confused = "events/chat1/airi1/airi1_confused.png"
 image airi1_face_embarrased = "events/chat1/airi1/airi1_embarrased.png"
@@ -31,8 +31,8 @@ image ruka happy = "sprites/ruka/ruka_happy.png"
 image ruka neutral = "sprites/ruka/ruka_neutral.png"
 image ruka smile = "sprites/ruka/ruka_smile.png"
 
-# Sprites para Chat (Base + Expresión/Cara)
-image ruka1_base = "events/chat1/ruka1/ruka1_base.png"
+# Sprites para Chat (Fondo + Sprites)
+image ruka1_bg = "bgs/ruka1_bg.png"
 image ruka1_face_angry = "events/chat1/ruka1/ruka1_angry.png"
 image ruka1_face_confused = "events/chat1/ruka1/ruka1_confused.png"
 image ruka1_face_embarrased = "events/chat1/ruka1/ruka1_embarrased.png"
@@ -54,8 +54,8 @@ image kaori curious = "sprites/kaori/kaori_curious.png"
 image kaori neutral = "sprites/kaori/kaori_neutral.png"
 image kaori smile = "sprites/kaori/kaori_smile.png"
 
-# Sprites para Chat (Base + Expresión/Cara)
-image kaori1_base = "events/chat1/kaori1/kaori1_base.png"
+# Sprites para Chat (Fondo + Sprites)
+image kaori1_bg = "bgs/kaori1_bg.png"
 image kaori1_face_angry = "events/chat1/kaori1/kaori1_angry.png"
 image kaori1_face_confused = "events/chat1/kaori1/kaori1_confused.png"
 image kaori1_face_embarrased = "events/chat1/kaori1/kaori1_embarrased.png"
