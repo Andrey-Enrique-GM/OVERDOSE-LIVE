@@ -31,7 +31,7 @@ image airi2_face_sad = "events/chat2/airi2/airi2_sad.png"
 image airi2_face_smile = "events/chat2/airi2/airi2_smile.png"
 image airi2_face_surprised = "events/chat2/airi2/airi2_surprised.png"
 
-define airi = Character("Airi", color="#7febfc", image="airi")
+define airi = Character("Airi Shirayuki", color="#40c2d6", image="airi")
 
 
 
@@ -64,7 +64,7 @@ image ruka2_face_sad = "events/chat2/ruka2/ruka2_sad.png"
 image ruka2_face_smile = "events/chat2/ruka2/ruka2_smile.png"
 image ruka2_face_surprised = "events/chat2/ruka2/ruka2_surprised.png"
 
-define ruka = Character("Ruka", color="#c551f3", image="ruka")
+define ruka = Character("Ruka Kurogane", color="#9e36c7", image="ruka")
 
 
 
@@ -98,4 +98,4 @@ image kaori2_face_sad = "events/chat2/kaori2/kaori2_sad.png"
 image kaori2_face_smile = "events/chat2/kaori2/kaori2_smile.png"
 image kaori2_face_surprised = "events/chat2/kaori2/kaori2_surprised.png"
 
-define kaori = Character("Kaori", color="#b34343", image="kaori")
+define kaori = Character("Kaori Sumizome", color="#d24444", image="kaori")

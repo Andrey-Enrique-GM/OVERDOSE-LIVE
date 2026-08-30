@@ -13,28 +13,28 @@ default stream_viewers_count = 1250
 screen stream_overlay_screen(char_name):
     # Banner superior "EN VIVO"
     frame:
-        xalign 0.05
+        xalign 0.04
         yalign 0.03
         background Solid("#cc000088")
-        padding (15, 8)
+        padding (20, 10)
         
         hbox:
-            spacing 10
-            text "● EN VIVO" color "#ffffff" size 20 bold True
-            text " | Espectadores: [stream_viewers_count]" color "#dddddd" size 18
+            spacing 12
+            text "* EN VIVO" color "#ffffff" size 24 bold True
+            text " | Espectadores: [stream_viewers_count]" color "#dddddd" size 22
 
-    # Caja del Chat del Stream (derecha)
+    # Caja del Chat del Stream
     frame:
         xalign 0.96
-        yalign 0.15
-        xsize 380
-        ysize 450
+        yalign 0.12
+        xsize 480
+        ysize 600
         background Solid("#000000aa")
-        padding (15, 15)
+        padding (18, 18)
 
         vbox:
-            spacing 8
-            text "CHAT EN VIVO" color "#ffcc00" size 16 bold True
+            spacing 10
+            text "CHAT EN VIVO" color "#ffcc00" size 20 bold True
             null height 5
 
             viewport:
@@ -44,16 +44,16 @@ screen stream_overlay_screen(char_name):
                 yinitial 1.0
 
                 vbox:
-                    spacing 6
+                    spacing 8
                     for author, msg in stream_live_chat:
                         hbox:
-                            spacing 5
-                            text "[author]:" color "#4da6ff" size 16 bold True
-                            text "[msg]" color "#ffffff" size 16
+                            spacing 8
+                            text "[author]:" color "#4da6ff" size 20 bold True
+                            text "[msg]" color "#ffffff" size 20
 
 
 # LÓGICA DE CONTROL DEL STREAMING (LABEL)
-label iniciar_simulacion_stream(idea_stream):
+label iniciar_simulacion_stream(idea_stream, duracion_live):
     $ stream_viewers_count = random.randint(800, 2500)
     $ stream_live_chat = []
     $ prev_expression = ""
@@ -127,8 +127,12 @@ label iniciar_simulacion_stream(idea_stream):
         # Fluctuación orgánica de espectadores
         $ stream_viewers_count += random.randint(-15, 30)
 
-        # Diálogo interactivo del personaje
-        "[current_character_name]" "[evt_dialogo]"
+        # Usar el objeto de Character correspondiente para mantener el color configurado en characters.rpy
+        $ char_obj = getattr(store, current_character_id, None)
+        if char_obj:
+            $ renpy.say(char_obj, evt_dialogo)
+        else:
+            "[current_character_name]" "[evt_dialogo]"
 
         $ idx += 1
 
