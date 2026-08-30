@@ -11,6 +11,10 @@ default stream_viewers_count = 1250
 
 # INTERFAZ DE USUARIO: OVERLAY DEL STREAM
 screen stream_overlay_screen(char_name):
+    # Bloquear menú del juego si el guardado está deshabilitado
+    if not config.save:
+        key "game_menu" action NullAction()
+
     # Banner superior "EN VIVO"
     frame:
         xalign 0.04
@@ -53,16 +57,17 @@ screen stream_overlay_screen(char_name):
 
 
 # LÓGICA DE CONTROL DEL STREAMING (LABEL)
-label iniciar_simulacion_stream(idea_stream, duracion_live):
+label iniciar_simulacion_stream(idea_stream, duracion_stream):
+    $ config.save = False
     $ stream_viewers_count = random.randint(800, 2500)
     $ stream_live_chat = []
     $ prev_expression = ""
     
     "Preparando la transmisión en vivo sobre: '[idea_stream]'..."
-    "Duración estimada del stream: [duracion_live] bloques."
+    "Duración estimada del stream: [duracion_stream] bloques."
 
     # Solicitar la simulación completa en un único mensaje JSON a la API
-    $ res_stream = consultar_groq(current_character_id, idea_stream, fase="simular_stream", duracion=duracion_live)
+    $ res_stream = consultar_groq(current_character_id, idea_stream, fase="simular_stream", duracion=duracion_stream)
     
     $ eventos_stream = res_stream.get("eventos", [])
     $ resultado_puntos = int(res_stream.get("resultado_stream", 0))
@@ -156,4 +161,5 @@ label iniciar_simulacion_stream(idea_stream, duracion_live):
     else:
         "El stream terminó sin pena ni gloria (+0 puntos)."
 
+    $ config.save = True
     return resultado_puntos

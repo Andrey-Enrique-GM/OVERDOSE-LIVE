@@ -11,6 +11,10 @@ default current_chat_expression = "neutral"
 screen phone_chat_screen(char_name, mensajes_restantes, es_evaluacion_stream=False, es_noche=False):
     modal True
 
+    # Bloquear menú del juego si el guardado está deshabilitado
+    if not config.save:
+        key "game_menu" action NullAction()
+
     # Atajo de teclado: Enviar mensaje al presionar Enter
     if len(input_msg.strip()) > 0:
         key "K_RETURN" action Return(input_msg)

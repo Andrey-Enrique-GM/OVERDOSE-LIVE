@@ -4,6 +4,10 @@
 
 label loop_principal_dia:
     scene bedroom with dissolve
+    $ config.save = True
+    $ renpy.take_screenshot()
+    $ renpy.save("1-1")
+    $ renpy.notify("Autoguardado en Slot 1 completado")
     
     $ chat_history = []
     $ current_chat_suffix = "1"
@@ -20,6 +24,7 @@ label loop_principal_dia:
     # --------------------------------------------------------------------------
     # FASE 1/3: CHAT 1 (MAÑANA)
     # --------------------------------------------------------------------------
+    $ config.save = False
     while chats_realizados < chats_manana_limite:
         $ msgs_restantes = chats_manana_limite - chats_realizados
         $ input_msg = ""
@@ -50,6 +55,8 @@ label loop_principal_dia:
             call actualizar_sprite_chat(current_character_id, res_expresion, suffix="1")
             $ chats_realizados += 1
 
+    $ config.save = True
+
     # --------------------------------------------------------------------------
     # PREGUNTA Y EVALUACIÓN DE IDEA DE STREAM
     # --------------------------------------------------------------------------
@@ -57,6 +64,7 @@ label loop_principal_dia:
     call actualizar_sprite_chat(current_character_id, "curious", suffix="1")
 
     $ input_msg = ""
+    $ config.save = False
     call screen phone_chat_screen(current_character_name, 0, es_evaluacion_stream=True, es_noche=False)
     $ idea_stream_user = _return
 
@@ -75,6 +83,7 @@ label loop_principal_dia:
     $ chat_history.append({"sender": "char", "text": res_dialogo_eval, "expresion": res_expresion_eval})
     
     call actualizar_sprite_chat(current_character_id, res_expresion_eval, suffix="1")
+    $ config.save = True
 
     "Guardas tu teléfono. Es hora de preparar el setup de transmisión..."
     call ocultar_sprites_chat
@@ -88,11 +97,11 @@ label loop_principal_dia:
     "Tema programado para hoy: '[idea_stream_user]'"
 
     # Genera aleatoriamente entre 3 y 10 bloques para el stream en una sola llamada a la API
-    $ duracion_live = random.randint(3, 10)
-    call iniciar_simulacion_stream(idea_stream_user, duracion_live)
+    $ duracion_stream = random.randint(3, 10)
+    call iniciar_simulacion_stream(idea_stream_user, duracion_stream)
     $ resultado_puntos_stream = _return
 
-    # SÍNTESIS Y RESUMEN DEL DÍA (CHAT 1 + LIVE)
+    # SÍNTESIS Y RESUMEN DEL DÍA (CHAT 1 + STREAM)
     scene bedroom with dissolve
 
     "El stream ha terminado. Tomas un respiro mientras la noche empieza a caer..."
@@ -119,6 +128,7 @@ label loop_principal_dia:
 
     "Ya acostado en tu cama, ves una notificación en tu teléfono antes de dormir..."
 
+    $ config.save = False
     while chats_noche_realizados < chats_noche_limite:
         $ msgs_restantes = chats_noche_limite - chats_noche_realizados
         $ input_msg = ""
@@ -149,6 +159,8 @@ label loop_principal_dia:
             
             call actualizar_sprite_chat(current_character_id, res_expresion, suffix="2")
             $ chats_noche_realizados += 1
+
+    $ config.save = True
 
     # --------------------------------------------------------------------------
     # RESUMEN Y FINALIZACIÓN DEL DÍA
