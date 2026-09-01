@@ -14,7 +14,7 @@ default pts_afecto = 0
 default pts_stream = 0
 default current_day = 1
 default current_chat_suffix = "1" # "1" para mañana, "2" para noche
-default resumen_dia_actual = ""    # Almacena el contexto generado para el chat nocturno
+default resumen_current_day = ""    # Almacena el contexto generado para el chat nocturno
 
 python early:
     import sys
@@ -109,7 +109,7 @@ label start:
     $ pts_afecto = 0
     $ pts_stream = 0
     $ current_day = 1
-    $ resumen_dia_actual = ""
+    $ resumen_current_day = ""
 
     call screen character_select_screen
     
@@ -118,3 +118,8 @@ label start:
         call cargar_personaje(_return)
 
     jump loop_principal_dia
+
+label evaluar_final:
+    "Has completado los 5 días de la transmisión."
+    "Evaluando final..."
+    return

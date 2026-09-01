@@ -112,7 +112,7 @@ label loop_principal_dia:
         fase="generar_resumen", 
         contexto_extra=f"Charlas de la mañana: {json.dumps(chat_history)}. Puntos stream: {resultado_puntos_stream}"
     )
-    $ resumen_dia_actual = res_resumen.get("resumen", f"Hablaron en la mañana y transmitieron sobre {idea_stream_user}.")
+    $ resumen_current_day = res_resumen.get("resumen", f"Hablaron en la mañana y transmitieron sobre {idea_stream_user}.")
 
     # --------------------------------------------------------------------------
     # FASE 3/3: CHAT 2 (NOCHE: 1 a 5 turnos)
@@ -142,7 +142,7 @@ label loop_principal_dia:
                 current_character_id, 
                 user_text, 
                 fase="chat_noche", 
-                resumen_dia=resumen_dia_actual,
+                resumen_dia=resumen_current_day,
                 historial=chat_history_noche
             )
             
@@ -173,6 +173,10 @@ label loop_principal_dia:
     "- Puntos de Rendimiento del Stream: [pts_stream]"
 
     $ current_day += 1
+    
+    if current_day > 5:
+        jump evaluar_final
+
     scene black with dissolve
     "Te quedas profundamente dormido..."
 
