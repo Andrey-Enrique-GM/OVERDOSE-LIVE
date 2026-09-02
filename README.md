@@ -1,0 +1,3 @@
+# OVERDOSE LIVE 📱🌸 
+
+**OVERDOSE LIVE** es una novela visual interactiva y simulador de streaming desarrollada en el motor **Ren'Py** e integrada dinámicamente con modelos de inteligencia artificial generativa mediante la API de **Groq**. El proyecto está diseñado bajo una arquitectura modular en **Python / Ren'Py Script**, combinando mecánicas tradicionales de novela visual con generación sintética de diálogos, simulación de chat en vivo y un sistema de progreso global persistente.
